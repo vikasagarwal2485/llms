@@ -1,0 +1,18 @@
+# Python virtual environment
+.myenv/
+.venv/
+venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Downloaded weights and training checkpoints (regenerable)
+gpt2/
+model/
+
+# macOS
+.DS_Store
