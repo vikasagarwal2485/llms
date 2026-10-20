@@ -1,6 +1,6 @@
 import pytest
 
-from textclf.config import ConfigError, load_config
+from classifier_model.config import ConfigError, load_config
 
 
 def _write(tmp_path, body):

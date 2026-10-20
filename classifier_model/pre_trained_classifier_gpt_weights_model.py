@@ -1,7 +1,8 @@
 # Classify text with the fine-tuned GPT-2 spam classifier.
-# Train the bundle first with: python -m textclf.train tasks/spam.yaml
+# Train the bundle first with: python -m classifier_model.train tasks/spam.yaml
+# Run from the repo root: python -m classifier_model.pre_trained_classifier_gpt_weights_model
 
-from textclf.predict import Classifier
+from classifier_model.predict import Classifier
 
 INPUT_TEXT = (
     "You are a winner you have been specially"

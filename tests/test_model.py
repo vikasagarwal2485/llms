@@ -1,10 +1,10 @@
 import tiktoken
 import torch
 
-from textclf import model as model_module
-from textclf.config import TaskConfig
-from textclf.data import ClassificationDataset, PAD_TOKEN_ID
-from textclf.model import apply_trainable, create_classifier, model_config, predict_logits
+from classifier_model import model as model_module
+from classifier_model.config import TaskConfig
+from classifier_model.data import ClassificationDataset, PAD_TOKEN_ID
+from classifier_model.model import apply_trainable, create_classifier, model_config, predict_logits
 
 
 def _trainable_names(model):

@@ -1,6 +1,6 @@
 import pytest
 
-from textclf.metrics import classification_metrics
+from classifier_model.metrics import classification_metrics
 
 
 def test_three_classes_with_never_predicted_class():

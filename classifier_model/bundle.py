@@ -8,7 +8,7 @@ from pathlib import Path
 import torch
 import yaml
 
-from textclf.model import create_classifier
+from classifier_model.model import create_classifier
 
 FORMAT_VERSION = 1
 WEIGHTS_FILE = "model.pth"

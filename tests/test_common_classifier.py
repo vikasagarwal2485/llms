@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from common_classifier import (
+from classifier_model.common_classifier import (
     calc_accuracy_loader,
     calc_loss_batch,
     evaluate_model,

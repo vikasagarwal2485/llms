@@ -3,8 +3,8 @@
 import torch
 
 from common import GPTModel
-from common_classifier import pool_logits
-from textclf.config import parse_trainable
+from classifier_model.common_classifier import pool_logits
+from classifier_model.config import parse_trainable
 
 BASE_CONFIG = {
     "vocab_size": 50257,     # Vocabulary size

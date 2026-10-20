@@ -1,10 +1,10 @@
 import pytest
 
 from common import GPTModel
-from textclf import model as model_module
-from textclf.bundle import REQUIRED_FILES, load_bundle
-from textclf.config import TaskConfig
-from textclf.train import run_training
+from classifier_model import model as model_module
+from classifier_model.bundle import REQUIRED_FILES, load_bundle
+from classifier_model.config import TaskConfig
+from classifier_model.train import run_training
 
 ROWS = {
     "billing": ["my invoice is wrong", "refund my payment", "charged twice this month"],

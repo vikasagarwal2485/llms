@@ -5,9 +5,9 @@ import pytest
 import torch
 
 from common import GPTModel
-from textclf.bundle import save_bundle
-from textclf.multitask import MultiTaskClassifier, frozen_depth
-from textclf.predict import Classifier
+from classifier_model.bundle import save_bundle
+from classifier_model.multitask import MultiTaskClassifier, frozen_depth
+from classifier_model.predict import Classifier
 
 TEXTS = [
     "refund please",
@@ -76,7 +76,7 @@ def test_perturbed_shared_layers_run_solo(tmp_path, base, tiny_config, caplog):
     with torch.no_grad():
         other_base.trf_blocks[0].att.W_query.weight.add_(1e-3)
     make_bundle(tmp_path, other_base, tiny_config, "b_task", ["x", "y"], {"last_blocks": 1})
-    with caplog.at_level(logging.WARNING, logger="textclf.multitask"):
+    with caplog.at_level(logging.WARNING, logger="classifier_model.multitask"):
         clf = MultiTaskClassifier.load(tmp_path, "cpu")
     assert list(clf.solo) == ["b_task"]
     assert "b_task" in caplog.text
@@ -86,7 +86,7 @@ def test_invalid_bundle_skipped(tmp_path, base, tiny_config, caplog):
     make_bundle(tmp_path, base, tiny_config, "good", ["x", "y"], {"last_blocks": 1})
     bad = make_bundle(tmp_path, base, tiny_config, "bad", ["x", "y"], {"last_blocks": 1})
     (bad / "model.pth").write_bytes(b"corrupt")
-    with caplog.at_level(logging.ERROR, logger="textclf.multitask"):
+    with caplog.at_level(logging.ERROR, logger="classifier_model.multitask"):
         clf = MultiTaskClassifier.load(tmp_path, "cpu")
     assert list(clf.tasks) == ["good"]
     assert "bad" in caplog.text

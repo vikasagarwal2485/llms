@@ -16,13 +16,13 @@ import tiktoken
 import torch
 import yaml
 
-from common_classifier import pool_logits
-from textclf.bundle import CONFIG_FILE, META_FILE, load_bundle
-from textclf.config import parse_trainable
-from textclf.data import PAD_TOKEN_ID, collate, encode_text
-from textclf.model import select_device
+from classifier_model.common_classifier import pool_logits
+from classifier_model.bundle import CONFIG_FILE, META_FILE, load_bundle
+from classifier_model.config import parse_trainable
+from classifier_model.data import PAD_TOKEN_ID, collate, encode_text
+from classifier_model.model import select_device
 
-logger = logging.getLogger("textclf.multitask")
+logger = logging.getLogger("classifier_model.multitask")
 
 
 def frozen_depth(trainable, n_layers):

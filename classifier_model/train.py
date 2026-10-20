@@ -1,6 +1,6 @@
 """Fine-tune GPT-2 into an N-class classifier from a task config.
 
-Usage: python -m textclf.train tasks/<task>.yaml [--device auto|cpu|mps|cuda] [--artifacts artifacts]
+Usage: python -m classifier_model.train tasks/<task>.yaml [--device auto|cpu|mps|cuda] [--artifacts artifacts]
 """
 
 import argparse
@@ -12,10 +12,10 @@ import tiktoken
 import torch
 from torch.utils.data import DataLoader
 
-from common_classifier import train_classifier_simple
-from textclf.bundle import save_bundle
-from textclf.config import ConfigError, load_config
-from textclf.data import (
+from classifier_model.common_classifier import train_classifier_simple
+from classifier_model.bundle import save_bundle
+from classifier_model.config import ConfigError, load_config
+from classifier_model.data import (
     PAD_TOKEN_ID,
     ClassificationDataset,
     DataError,
@@ -26,8 +26,8 @@ from textclf.data import (
     longest_encoded_length,
     read_split,
 )
-from textclf.metrics import classification_metrics
-from textclf.model import build_classifier, config_of, predict_logits, select_device
+from classifier_model.metrics import classification_metrics
+from classifier_model.model import build_classifier, config_of, predict_logits, select_device
 
 
 def predict_split(model, loader, device):

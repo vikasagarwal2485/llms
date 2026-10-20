@@ -22,3 +22,10 @@ artifacts/
 
 # Generated example datasets
 datasets/
+
+# Earlier GPT-2 experiments (book exercises), kept locally but not part of this repo
+pre_trained_gpt_style_model.py
+pre_trained_gpt_style_model.ipynb
+pre_trained_gpt_weights_model.py
+pre_trained_gpt_weights_model.ipynb
+pre_trained_classifier_gpt_weights_model.ipynb

@@ -1,6 +1,26 @@
-# language_model_handson
+# llms
 
-Hands-on GPT-2 experiments based on *Build a Large Language Model From Scratch* (`common.py`, the notebooks), plus `textclf`, a general-purpose text classifier that fine-tunes GPT-2 open weights for any labeled dataset and serves it over a local HTTP API.
+Language models built on GPT-2, using the from-scratch `GPTModel` from *Build a Large Language Model From Scratch* and OpenAI's GPT-2 open weights.
+
+The main component is **`classifier_model`**, which fine-tunes GPT-2 into a text classifier for any labeled dataset and serves every trained classifier through one local HTTP API. The GPT core it builds on (`common.py`, `gpt_download.py`) is shared, so the repo can grow a GPT text-generation model next to it (see [Extending](#extending-text-generation)).
+
+## Repository layout
+
+```
+common.py              GPT core: GPTModel, generate_text_simple, load_weights_into_gpt  (shared)
+gpt_download.py        downloads and loads OpenAI GPT-2 weights into gpt2/<size>/        (shared)
+classifier_model/      text classification package
+  config.py data.py model.py train.py metrics.py bundle.py predict.py multitask.py server.py
+  common_classifier.py               training loop and last-token pooling helpers
+  pre_trained_classifier_gpt_weights_model.py   minimal example: classify with the spam model
+tasks/                 one YAML config per classification task (spam.yaml, ag_news.yaml)
+data/                  datasets kept in git: SMS spam splits and raw TSV, the-verdict.txt (sample text for generation)
+examples/              dataset preparation scripts (prepare_ag_news.py)
+tests/                 pytest suite
+openspec/              specs and change history (OpenSpec)
+
+Generated and git-ignored: gpt2/ (base weights), artifacts/ (trained models), datasets/ (prepared example data)
+```
 
 ## Setup
 
@@ -11,7 +31,7 @@ python3.11 -m venv .myenv
 
 Commands below run from the repo root with `.myenv/bin/python`. The GPT-2 124M weights (about 500 MB) download into `gpt2/124M/` the first time a task trains.
 
-## Text classification (`textclf`)
+## Text classification (`classifier_model`)
 
 ### 1. Prepare a dataset
 
@@ -49,7 +69,7 @@ Examples are in [`tasks/spam.yaml`](tasks/spam.yaml) and [`tasks/ag_news.yaml`](
 ### 3. Train
 
 ```bash
-.myenv/bin/python -m textclf.train tasks/spam.yaml        # --device cpu|mps|cuda, --artifacts DIR
+.myenv/bin/python -m classifier_model.train tasks/spam.yaml        # --device cpu|mps|cuda, --artifacts DIR
 ```
 
 This writes a self-contained bundle to `artifacts/<task>/`:
@@ -71,11 +91,11 @@ Retraining replaces the bundle only once the new one is fully written.
 ### 4. Predict
 
 ```bash
-.myenv/bin/python -m textclf.predict --bundle artifacts/spam "Win a free prize now" "See you at lunch"
+.myenv/bin/python -m classifier_model.predict --bundle artifacts/spam "Win a free prize now" "See you at lunch"
 ```
 
 ```python
-from textclf.predict import Classifier
+from classifier_model.predict import Classifier
 clf = Classifier.load("artifacts/spam")
 clf.predict(["Win a free prize now"])  # [{"label": "spam", "probabilities": {"ham": ..., "spam": ...}}]
 ```
@@ -83,7 +103,7 @@ clf.predict(["Win a free prize now"])  # [{"label": "spam", "probabilities": {"h
 ### 5. Serve
 
 ```bash
-.myenv/bin/python -m textclf.server            # --artifacts artifacts --host 127.0.0.1 --port 8000
+.myenv/bin/python -m classifier_model.server            # --artifacts artifacts --host 127.0.0.1 --port 8000
 ```
 
 The server loads every bundle under `artifacts/` and listens on localhost only by default. Interactive docs are at `http://127.0.0.1:8000/docs`.
@@ -121,3 +141,13 @@ Tasks whose frozen layers are identical (the default `trainable: {last_blocks: 1
 ## How it works
 
 The classifier is the book's `GPTModel` loaded with OpenAI GPT-2 weights. Its 50,257-way vocabulary head is replaced by a `Linear(emb_dim -> N)` layer. By default only the last transformer block, the final layer norm and the new head are trained. Class scores come from the last *real* token of each text. Because GPT-2 only looks backward, the padding after that token has no effect, so predictions don't depend on padding length.
+
+## Extending: text generation
+
+The classifier swaps GPT-2's 50,257-way vocabulary head for an N-class head. A text-generation model keeps that head and reuses the same shared core:
+
+- `common.GPTModel`, `load_weights_into_gpt` and `gpt_download.download_and_load_gpt2` give a pre-trained GPT-2 ready to generate.
+- `common.generate_text_simple`, `text_to_token_ids` and `token_ids_to_text` cover greedy decoding.
+- `common.GPTDatasetV1` / `create_dataloader_v1` build next-token training data, e.g. from `data/the-verdict.txt`.
+
+To add one, create a sibling package (for example `generation_model/`) with its own train, generate and serve modules, following the `classifier_model` layout. Keep model-agnostic code in `common.py`.

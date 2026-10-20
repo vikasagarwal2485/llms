@@ -1,6 +1,6 @@
 """Classify text with a trained model bundle (no TensorFlow needed).
 
-Usage: python -m textclf.predict --bundle artifacts/<task> "some text" ["more text" ...]
+Usage: python -m classifier_model.predict --bundle artifacts/<task> "some text" ["more text" ...]
 """
 
 import argparse
@@ -9,9 +9,9 @@ import sys
 import tiktoken
 import torch
 
-from textclf.bundle import BundleError, load_bundle
-from textclf.data import collate, encode_text
-from textclf.model import predict_logits, select_device
+from classifier_model.bundle import BundleError, load_bundle
+from classifier_model.data import collate, encode_text
+from classifier_model.model import predict_logits, select_device
 
 
 class Classifier:

@@ -3,7 +3,7 @@ import pytest
 import tiktoken
 import torch
 
-from textclf.data import (
+from classifier_model.data import (
     ClassificationDataset,
     DataError,
     balance_classes,

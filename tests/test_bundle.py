@@ -1,8 +1,8 @@
 import pytest
 import torch
 
-from textclf.bundle import BundleError, load_bundle, save_bundle
-from textclf.model import create_classifier
+from classifier_model.bundle import BundleError, load_bundle, save_bundle
+from classifier_model.model import create_classifier
 
 LABELS = [{"id": 0, "value": "a", "name": "A"}, {"id": 1, "value": "b", "name": "B"}]
 

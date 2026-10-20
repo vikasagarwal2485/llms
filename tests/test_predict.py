@@ -4,9 +4,9 @@ import sys
 import pytest
 import torch
 
-from textclf.bundle import save_bundle
-from textclf.model import create_classifier
-from textclf.predict import Classifier
+from classifier_model.bundle import save_bundle
+from classifier_model.model import create_classifier
+from classifier_model.predict import Classifier
 
 LABELS = [{"id": i, "value": v, "name": v} for i, v in enumerate(["billing", "sales", "technical"])]
 TEXTS = ["refund please", "the app keeps crashing when I open settings", "quote", "hi", "x " * 40,
@@ -35,14 +35,14 @@ def test_probabilities_and_order(bundle):
 
 
 def test_predict_does_not_import_tensorflow():
-    code = "import sys, textclf.predict, textclf.server; print('tensorflow' in sys.modules)"
+    code = "import sys, classifier_model.predict, classifier_model.server; print('tensorflow' in sys.modules)"
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
     assert out.stdout.strip() == "False"
 
 
 def test_cli(bundle):
     out = subprocess.run(
-        [sys.executable, "-m", "textclf.predict", "--bundle", str(bundle), "--device", "cpu", "refund please"],
+        [sys.executable, "-m", "classifier_model.predict", "--bundle", str(bundle), "--device", "cpu", "refund please"],
         capture_output=True, text=True,
     )
     assert out.returncode == 0

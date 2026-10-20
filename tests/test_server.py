@@ -5,9 +5,9 @@ import pytest
 import torch
 from fastapi.testclient import TestClient
 
-from textclf.bundle import save_bundle
-from textclf.model import create_classifier
-from textclf.server import create_app
+from classifier_model.bundle import save_bundle
+from classifier_model.model import create_classifier
+from classifier_model.server import create_app
 
 
 def _labels(names):
@@ -43,7 +43,7 @@ def test_tasks_with_descriptions(client):
 
 def test_corrupt_bundle_is_skipped(artifacts, caplog):
     (artifacts / "topic" / "model.pth").write_bytes(b"not a model")
-    with caplog.at_level(logging.ERROR, logger="textclf.multitask"):
+    with caplog.at_level(logging.ERROR, logger="classifier_model.multitask"):
         client = TestClient(create_app(artifacts, "cpu"))
     assert client.get("/health").json()["tasks_loaded"] == 1
     assert "topic" in caplog.text

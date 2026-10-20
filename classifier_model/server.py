@@ -1,6 +1,6 @@
 """Local HTTP API that runs every trained task on the text it is given.
 
-Usage: python -m textclf.server [--artifacts artifacts] [--host 127.0.0.1] [--port 8000] [--device auto]
+Usage: python -m classifier_model.server [--artifacts artifacts] [--host 127.0.0.1] [--port 8000] [--device auto]
 """
 
 import argparse
@@ -9,7 +9,7 @@ import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, model_validator
 
-from textclf.multitask import MultiTaskClassifier
+from classifier_model.multitask import MultiTaskClassifier
 
 MAX_BATCH = 64
 
