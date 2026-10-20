@@ -1,0 +1,13 @@
+# AG News topic classification (4 classes, string labels).
+# Prepare the data first: python examples/prepare_ag_news.py
+task: ag_news
+description: >-
+  Classifies a news headline or short article into a topic: World, Sports, Business or Sci/Tech.
+train: datasets/ag_news/train.csv
+val: datasets/ag_news/val.csv
+test: datasets/ag_news/test.csv
+text_column: text
+label_column: label
+model_size: 124M
+epochs: 3
+max_length: 128

@@ -109,6 +109,19 @@ class SpamDataset(Dataset):
         # is the following, which is also used in the next chapter:
         # return max(len(encoded_text) for encoded_text in self.encoded_texts)
 
+def pool_logits(logits, lengths=None):
+    # Batches of (input, target) pool at the last position, as in the book.
+    # Batches of (input, target, lengths) pool at each sequence's last real (non-padding) token.
+    if lengths is None:
+        return logits[:, -1, :]
+    batch_index = torch.arange(logits.shape[0], device=logits.device)
+    return logits[batch_index, lengths.to(logits.device) - 1]
+
+def unpack_batch(batch):
+    input_batch, target_batch, *rest = batch
+    lengths = rest[0] if rest else None
+    return input_batch, target_batch, lengths
+
 def calc_accuracy_loader(data_loader, model, device, num_batches=None):
     model.eval()
     correct_predictions, num_examples = 0, 0
@@ -117,13 +130,14 @@ def calc_accuracy_loader(data_loader, model, device, num_batches=None):
         num_batches = len(data_loader)
     else:
         num_batches = min(num_batches, len(data_loader))
-    for i, (input_batch, target_batch) in enumerate(data_loader):
+    for i, batch in enumerate(data_loader):
         if i < num_batches:
+            input_batch, target_batch, lengths = unpack_batch(batch)
             input_batch, target_batch = input_batch.to(device), target_batch.to(device)
             #print (target_batch)
             with torch.no_grad():
                 #print (model(input_batch))
-                logits = model(input_batch)[:, -1, :]  # Logits of last output token
+                logits = pool_logits(model(input_batch), lengths)  # Logits of last output token
             predicted_labels = torch.argmax(logits, dim=-1)
             #print (logits)
             #print (predicted_labels)
@@ -133,9 +147,9 @@ def calc_accuracy_loader(data_loader, model, device, num_batches=None):
             break
     return correct_predictions / num_examples
 
-def calc_loss_batch(input_batch, target_batch, model, device):
+def calc_loss_batch(input_batch, target_batch, model, device, lengths=None):
     input_batch, target_batch = input_batch.to(device), target_batch.to(device)
-    logits = model(input_batch)[:, -1, :]  # Logits of last output token
+    logits = pool_logits(model(input_batch), lengths)  # Logits of last output token
     loss = torch.nn.functional.cross_entropy(logits, target_batch)
     return loss
 
@@ -150,9 +164,10 @@ def calc_loss_loader(data_loader, model, device, num_batches=None):
         # Reduce the number of batches to match the total number of batches in the data loader
         # if num_batches exceeds the number of batches in the data loader
         num_batches = min(num_batches, len(data_loader))
-    for i, (input_batch, target_batch) in enumerate(data_loader):
+    for i, batch in enumerate(data_loader):
         if i < num_batches:
-            loss = calc_loss_batch(input_batch, target_batch, model, device)
+            input_batch, target_batch, lengths = unpack_batch(batch)
+            loss = calc_loss_batch(input_batch, target_batch, model, device, lengths)
             total_loss += loss.item()
         else:
             break
@@ -169,9 +184,10 @@ def train_classifier_simple(model, train_loader, val_loader, optimizer, device, 
     for epoch in range(num_epochs):
         model.train()  # Set model to training mode
 
-        for input_batch, target_batch in train_loader:
+        for batch in train_loader:
+            input_batch, target_batch, lengths = unpack_batch(batch)
             optimizer.zero_grad() # Reset loss gradients from previous batch iteration
-            loss = calc_loss_batch(input_batch, target_batch, model, device)
+            loss = calc_loss_batch(input_batch, target_batch, model, device, lengths)
             loss.backward() # Calculate loss gradients
             optimizer.step() # Update model weights using loss gradients
             examples_seen += input_batch.shape[0] # New: track examples instead of tokens

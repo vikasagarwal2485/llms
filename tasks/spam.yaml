@@ -1,0 +1,18 @@
+# SMS spam vs. ham, using the pre-split CSVs in the repo root (already balanced).
+# Hyperparameters match pre_trained_classifier_gpt_weights_model.ipynb.
+task: spam
+description: >-
+  Detects whether a short text message (SMS) is spam or legitimate (ham).
+train: sms_spam_collection_train.csv
+val: sms_spam_collection_validation.csv
+test: sms_spam_collection_test.csv
+text_column: Text
+label_column: Label
+label_names: {0: ham, 1: spam}
+model_size: 124M
+epochs: 5
+learning_rate: 5.0e-5
+weight_decay: 0.1
+batch_size: 8
+seed: 123
+trainable: {last_blocks: 1}

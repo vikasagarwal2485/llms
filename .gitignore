@@ -16,3 +16,9 @@ model/
 
 # macOS
 .DS_Store
+
+# Trained classifier bundles (about 500 MB each)
+artifacts/
+
+# Generated example datasets
+datasets/
