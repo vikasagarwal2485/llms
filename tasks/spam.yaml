@@ -3,9 +3,9 @@
 task: spam
 description: >-
   Detects whether a short text message (SMS) is spam or legitimate (ham).
-train: data/sms_spam_collection_train.csv
-val: data/sms_spam_collection_validation.csv
-test: data/sms_spam_collection_test.csv
+train: datasets/spam/sms_spam_collection_train.csv
+val: datasets/spam/sms_spam_collection_validation.csv
+test: datasets/spam/sms_spam_collection_test.csv
 text_column: Text
 label_column: Label
 label_names: {0: ham, 1: spam}

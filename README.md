@@ -14,12 +14,14 @@ classifier_model/      text classification package
   common_classifier.py               training loop and last-token pooling helpers
   pre_trained_classifier_gpt_weights_model.py   minimal example: classify with the spam model
 tasks/                 one YAML config per classification task (spam.yaml, ag_news.yaml)
-data/                  datasets kept in git: SMS spam splits and raw TSV, the-verdict.txt (sample text for generation)
+datasets/              datasets kept in git
+  spam/                SMS spam splits and raw TSV, the-verdict.txt (sample text for generation)
+  ag_news/             4-class news topics sample (regenerate with examples/prepare_ag_news.py)
 examples/              dataset preparation scripts (prepare_ag_news.py)
 tests/                 pytest suite
 openspec/              specs and change history (OpenSpec)
 
-Generated and git-ignored: gpt2/ (base weights), artifacts/ (trained models), datasets/ (prepared example data)
+Generated and git-ignored: gpt2/ (base weights), artifacts/ (trained models)
 ```
 
 ## Setup
@@ -44,9 +46,9 @@ Create `tasks/<task>.yaml`. Paths are relative to the directory you run commands
 ```yaml
 task: support            # bundle name; the key for this task in /classify results
 description: Routes customer support tickets to billing, technical or sales.  # optional; shown in GET /tasks
-train: data/support/train.csv
-val: data/support/val.csv
-test: data/support/test.csv
+train: datasets/support/train.csv
+val: datasets/support/val.csv
+test: datasets/support/test.csv
 text_column: text
 label_column: label
 model_size: 124M         # 124M, 355M, 774M or 1558M
@@ -64,7 +66,7 @@ model_size: 124M         # 124M, 355M, 774M or 1558M
 # eval_iter: 5           # batches used per loss/accuracy report
 ```
 
-Examples are in [`tasks/spam.yaml`](tasks/spam.yaml) and [`tasks/ag_news.yaml`](tasks/ag_news.yaml). Run `python examples/prepare_ag_news.py` before training the AG News task.
+Examples are in [`tasks/spam.yaml`](tasks/spam.yaml) and [`tasks/ag_news.yaml`](tasks/ag_news.yaml). The AG News sample is already in `datasets/ag_news/`. To rebuild it or change its size, run `python examples/prepare_ag_news.py`.
 
 ### 3. Train
 
@@ -148,6 +150,6 @@ The classifier swaps GPT-2's 50,257-way vocabulary head for an N-class head. A t
 
 - `common.GPTModel`, `load_weights_into_gpt` and `gpt_download.download_and_load_gpt2` give a pre-trained GPT-2 ready to generate.
 - `common.generate_text_simple`, `text_to_token_ids` and `token_ids_to_text` cover greedy decoding.
-- `common.GPTDatasetV1` / `create_dataloader_v1` build next-token training data, e.g. from `data/the-verdict.txt`.
+- `common.GPTDatasetV1` / `create_dataloader_v1` build next-token training data, e.g. from `datasets/spam/the-verdict.txt`.
 
 To add one, create a sibling package (for example `generation_model/`) with its own train, generate and serve modules, following the `classifier_model` layout. Keep model-agnostic code in `common.py`.
